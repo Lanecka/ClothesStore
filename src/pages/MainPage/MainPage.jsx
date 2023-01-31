@@ -1,13 +1,43 @@
+import { useEffect, useState } from "react";
 import Footer from "../../components/blocks/Footer/Footer";
 import Header from "../../components/blocks/Header/Header";
 import Card from "../../components/elements/Card/Card";
-import { products } from "../../products";
+import DrawerPage from "../DrawerPage/DrawerPage";
 import style from './MainPage.module.scss';
 
 function MainPage() {
+  // Создаем useState для передачи данных с сервака
+  const [product, setProduct] = useState([])
+  // useState для добавления карты товара в корзину
+  const [addDrawerCard, setAddDrawerCard] = useState([])
+
+  // Метод Fetch
+  useEffect(() => {
+    fetch('https://63d928855a330a6ae175d62c.mockapi.io/products')
+      .then((res) => {
+        return res.json();
+      })
+      .then((json) => {
+        setProduct(json);
+      })
+  }, [])
+
+  // контролируем процесс затемнения экрана
+  const [openDrawer, setOpenDraver] = useState(false);
+
+  /** ф-ция добавления карточки в козину */
+  const addCardToDrawer = (obj) => {
+    setAddDrawerCard([...addDrawerCard, obj])
+  }
+
   return (
     <>
-      <Header />
+      {/* условие открытия/закрытия окна корзины, добавления карточки в корзину */}
+      {openDrawer && <DrawerPage onClose={() => setOpenDraver(false)} product={addDrawerCard} />}
+
+      {/* При нажатии на корзину, открывается окно корзины */}
+      <Header handleOnBasket={() => setOpenDraver(true)} />
+
       <div className="container">
         {/* Products */}
         <div className={style.products}>
@@ -23,14 +53,14 @@ function MainPage() {
 
           <div className={style.items}>
             {
-              products.map((card) => (
+              product.map((card) => (
                 <Card
                   key={card.id}
                   imgPreview={card.imgPreview}
                   brand={card.brand}
                   typeClothes={card.typeClothes}
                   price={card.price}
-                  onClickAdd={() => alert(card.price)}
+                  onPlus={(obj) => addCardToDrawer(obj)}
                 />
               ))
             }
@@ -38,6 +68,7 @@ function MainPage() {
 
         </div>
       </div>
+
       <Footer />
     </>
   )
