@@ -1,0 +1,86 @@
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #533333;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h2 {
+  color: #750000;
+  font-size: 36px;
+}
+
+h3 {
+  color: #750000;
+  font-size: 24px;
+}
+
+// Icons svg (basket, user)
+.icon {
+  cursor: pointer;
+  
+  &:hover {
+    path {
+      fill: #7D7D7D;
+      transition: .5s linear;
+    }
+  }
+}
+
+// icon favorite
+.favorite {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 1;
+  cursor: pointer;
+
+  &:hover {
+    path {
+      fill: #750000;
+      transition: .5s linear;
+    }
+  }
+}
+
+// btn plus/closed
+.btnSquared {
+  cursor: pointer;
+
+  &:hover {
+    cursor: pointer;
+
+    path {
+      fill: #750000;
+      transition: .5s linear;
+    }
+
+    rect {
+      stroke: #750000;
+      transition: .5s linear;
+    }
+  }
+}
+
+//icons socialmedia
+.socialmedia {
+  margin-top: 10px;
+  margin-right: 20px;
+  cursor: pointer;
+
+  &:last-child {
+    margin-right: 0;
+  }
+
+  &:hover {
+    path {
+      fill: #7D7D7D;
+    }
+  }
+}

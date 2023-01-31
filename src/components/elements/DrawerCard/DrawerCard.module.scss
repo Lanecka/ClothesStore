@@ -1,0 +1,75 @@
+// drawerCard
+.drawerCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #D9D9D9;
+  border-radius: 30px;
+  padding: 25px 20px;
+  margin-bottom: 20px;
+  margin-top: 5px;
+
+  &:hover {
+    border: 1px solid #750000;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    transition: .5s linear;
+
+    transform: translate3d(0, -4px, -4px);
+  }
+
+  .preview {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-right: 20px;
+  }
+
+  .img {
+    width: 150px;
+    height: 150px;
+    margin-right: 20px;
+    border-radius: 50%;
+    background-color: #7D7D7D;
+    // background-image: url('../public/img/products/1.png');
+    // background-size: cover;
+    // -webkit-background-size: cover;
+    // background-repeat: no-repeat;
+
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+
+      object-fit: cover;  // убираем искажение 
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+    }
+  }
+
+  .title {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+
+    h3 {
+      line-height: 0;
+      margin-bottom: 5px;
+    }
+
+    p {
+      font-family: 'Open Sans', sans-serif;
+      font-size: 24px;
+      line-height: 0;
+    }
+  }
+
+  .price h2 {
+    font-family: 'Roboto', sans-serif;
+    color: black;
+    line-height: 0;
+  }
+}
