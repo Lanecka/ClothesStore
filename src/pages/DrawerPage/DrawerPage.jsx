@@ -1,8 +1,42 @@
+import axios from 'axios';
+import { useContext, useState } from 'react';
 import BasketEmpty from '../../components/blocks/BasketEmpty/BasketEmpty';
+import Order from '../../components/blocks/Order/Order';
 import DrawerCard from '../../components/elements/DrawerCard/DrawerCard';
+import AppContext from '../../contex';
 import style from './DrawerPage.module.scss';
 
-function DrawerPage({ onClose, product = [], onRemove }) {
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+function DrawerPage({ onClose, basket = [], onRemove }) {
+  // Оформление заказа
+  const [isOrderComplete, setIsOrderComplete] = useState(false)
+  // useState id заказа
+  const [orderId, setOrderID] = useState(null)
+  // Загрузка при нажатии кнопки
+  const [isLoading, setIsLoading] = useState(false)
+
+  const { addDrawerCard, setAddDrawerCard } = useContext(AppContext)
+
+  const onClickOrder = async () => {
+    try {
+      setIsLoading(true)
+      //через axios, передаем не один объект, а весь массив
+      const { data } = await axios.post(`http://localhost:3001/orders`, { items: addDrawerCard })
+      setOrderID(data.id)   
+
+      addDrawerCard.forEach(item => {
+        axios.delete(`http://localhost:3001/basketItems/` + item.id)
+      })
+      
+      setAddDrawerCard([]) // очищаем корзину      
+      setIsOrderComplete(true) // заказ создан
+    } catch (error) {
+      alert('Ошибка при создании заказа!')
+    }
+    setIsLoading(false)
+  }
+
   return (
     <div className={style.overlay}>
       {/* окно корзины */}
@@ -16,12 +50,13 @@ function DrawerPage({ onClose, product = [], onRemove }) {
         </div>
 
         {
-          product.length > 0 ?
+          basket.length > 0 ?
             <div>
               <div className={style.scrollbar}>
-                {product.map((obj) => (
+                {basket.map((obj, id) => (
                   <DrawerCard
-                    key={obj.id}
+                    key={id}
+                    id={obj.id}
                     imgPreview={obj.imgPreview}
                     brand={obj.brand}
                     typeClothes={obj.typeClothes}
@@ -37,14 +72,14 @@ function DrawerPage({ onClose, product = [], onRemove }) {
                     <h2>К оплате:</h2>
                     <p>14 380 ₽</p>
                   </div>
-                  <button className={style.btn}>
+                  <button disabled={isLoading} onClick={onClickOrder} className={style.btn}>
                     Заказать
                   </button>
                 </div>
               </div>
             </div>
 
-            : <BasketEmpty onBack={onClose} />
+            : (isOrderComplete ? <Order onBack={onClose} orderId={orderId} /> : <BasketEmpty onBack={onClose} />)
         }
       </div>
     </div>

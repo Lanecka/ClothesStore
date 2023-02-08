@@ -1,61 +1,48 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useContext, useState } from 'react';
 import Footer from '../../components/blocks/Footer/Footer';
 import Header from '../../components/blocks/Header/Header';
 import Card from '../../components/elements/Card/Card';
-import DrawerPage from '../DrawerPage/DrawerPage';
+import AppContext from '../../contex';
 import style from './MainPage.module.scss';
 
-function MainPage() {
-  // Создаем useState для передачи данных с сервака
-  const [product, setProduct] = useState([]);
-  // useState для добавления карты товара в корзину
-  const [addDrawerCard, setAddDrawerCard] = useState([]);
+function MainPage({ onRemoveDrawer, addCardToDrawer, onFavoriteButton,  isLoading }) {
   // useState для инпута поиска, сохраняет введенные символы
   const [searchValue, setSearchValue] = useState('');
 
-  // AXIOS - метод
-  useEffect(() => {
-    // Получаем данные products с сервера
-    axios.get('https://63d928855a330a6ae175d62c.mockapi.io/products')
-      .then((res) => setProduct(res.data))
-    // Получаем данные basketCard с сервра   
-    axios.get('https://63d928855a330a6ae175d62c.mockapi.io/basketCard')
-      .then((res) => setAddDrawerCard(res.data))
-  }, [])
-
-  // контролируем процесс затемнения экрана
-  const [openDrawer, setOpenDraver] = useState(false);
-
-  /** ф-ция добавления карточки в козину */
-  const addCardToDrawer = (obj) => {
-    // отправляем на сервер добавленные карточки
-    axios.post('https://63d928855a330a6ae175d62c.mockapi.io/basketCard', obj)
-    setAddDrawerCard([...addDrawerCard, obj])
-  }
-
-  // Удаление карточки из корзины
-  const onRemoveDrawer = (id) => {
-    axios.delete(`https://63d928855a330a6ae175d62c.mockapi.io/basketCard/${id}`)
-    setAddDrawerCard((prev) => prev.filter(item => item.id !== id))
-  }
+  const {favorite, addDrawerCard, product} = useContext(AppContext)
 
   /** Ф-ция получения введенных значений с инпута-поиска */
   const handleInput = (e) => {
     setSearchValue(e.target.value)
   }
 
+  /** рендер карточки */
+  const renderCard = () => {
+    /**  Поиск по типу одежды */
+    const filterProduct = product.filter((item) =>
+      item.typeClothes.toLowerCase().includes(searchValue.toLowerCase()))
+
+      // массив - загрузка наших непрогрузившихся карт
+    return (isLoading ? [{id:1}, {id:2}, {id:3}, {id:4}, {id:5}, {id:6}] : filterProduct).map((card) => (
+      <Card
+        key={card.id}
+        {...card}
+        onPlus={addCardToDrawer} // передаем серверу, что нажали на плюс
+        loading={isLoading}
+        onFavoriteButton={onFavoriteButton} // передает серверу, что нажали на сердечко
+        favorite={favorite.some(obj => Number(obj.id) === Number(card.id))} // сохраняет состояни избранного на главной, смотрит на сервер
+      
+      />
+    ))
+  }
+
   return (
     <>
-      {/* условие открытия/закрытия окна корзины, добавления карточки в корзину, удаление */}
-      {openDrawer && <DrawerPage
-        onClose={() => setOpenDraver(false)}
-        product={addDrawerCard}
-        onRemove={onRemoveDrawer}
-      />}
-
       {/* При нажатии на корзину, открывается окно корзины */}
-      <Header handleOnBasket={() => setOpenDraver(true)} />
+      <Header
+        onRemove={onRemoveDrawer}
+        addDrawerCard={addDrawerCard}
+      />
 
       <div className="container">
         {/* Products */}
@@ -85,22 +72,7 @@ function MainPage() {
           </div>
 
           <div className={style.items}>
-            {
-              product
-                //  Поиск по типу одежды 
-                .filter((item) => item.typeClothes.toLowerCase().includes(searchValue.toLowerCase()))
-                .map((card) => (
-                  <Card
-                    key={card.id}
-                    id={card.id}
-                    imgPreview={card.imgPreview}
-                    brand={card.brand}
-                    typeClothes={card.typeClothes}
-                    price={card.price}
-                    onPlus={(obj) => addCardToDrawer(obj)}
-                  />
-                ))
-            }
+            {renderCard()}
           </div>
 
         </div>
